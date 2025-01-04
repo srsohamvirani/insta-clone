@@ -30,7 +30,7 @@ router.post("/signup", (req, res) => {
       user
         .save()
         .then(() => {
-          res.json({ message: "user created successfully" });
+          res.json({ message: "Registered successfully" });
         })
         .catch((err) => {
           console.log(err);

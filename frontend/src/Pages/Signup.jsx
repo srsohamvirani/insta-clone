@@ -1,47 +1,76 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import logo from "../img/logo.png";
+import { Link, useNavigate } from "react-router-dom";
+
 import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Signup() {
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
 
-  // toast function
-  const notifyA = () => toast.error("wow");
+  // Toast functions
+  const notifyA = (msg) => toast.error(msg);
+  const notifyB = (msg) => toast.success(msg);
 
-  const postData = (e) => {
-    e.preventDefault(); // Prevent default form submission
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // const passReges = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
 
-    // sending data to server
-    fetch("http://localhost:5000/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name:name,
-        email:email,
-        userName:userName,
-        password:password
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        notifyA();
-        console.log(data);
+  const postData = async (e) => {
+    e.preventDefault();
+
+    // Check for empty fields
+    if (!name || !email || !userName || !password) {
+      notifyA("Please fill all the fields");
+      return;
+    }
+
+    // Check email format
+    if (!emailRegex.test(email)) {
+      notifyA("Invalid email format");
+      return;
+    // }else if (!passReges.test(password)) {
+    //   notifyA("Password must be at least 8 characters, including at least one letter and one number and one include both uppercase and lowercase letters and special characters including #,?,!,@");
+    //   return;
+    }
+    try {
+      const response = await fetch("http://localhost:5000/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          userName,
+          password,
+        }),
       });
+
+      const data = await response.json();
+      if (data.error) {
+        notifyA(data.error);
+      } else {
+        notifyB(data.message);
+        navigate("/signin");
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      notifyA("Server error, please try again later");
+    }
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+      <ToastContainer />
       <img src={logo} alt="logo" className="h-12 w-auto mb-4" />
       <h1 className="text-2xl font-bold text-gray-800 mb-6">Create your account</h1>
       <form
         className="w-full max-w-sm bg-white p-6 rounded-lg shadow-md"
-        onSubmit={postData} // Use onSubmit instead of onClick for the form
+        onSubmit={postData} // Use onSubmit for form submission
       >
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700" htmlFor="email">
@@ -55,7 +84,6 @@ export default function Signup() {
             placeholder="Email"
             onChange={(e) => setEmail(e.target.value)}
             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-            required
           />
         </div>
 
@@ -70,7 +98,6 @@ export default function Signup() {
             placeholder="Full Name"
             onChange={(e) => setName(e.target.value)}
             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-            required
           />
         </div>
 
@@ -85,7 +112,6 @@ export default function Signup() {
             placeholder="Username"
             onChange={(e) => setUserName(e.target.value)}
             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
-            required
           />
         </div>
 
@@ -104,25 +130,8 @@ export default function Signup() {
           />
         </div>
 
-        <div className="text-xs text-gray-600 mb-4 text-center">
-          By signing up, you agree to our{" "}
-          <a href="/terms" className="text-blue-500 hover:underline">
-            Terms
-          </a>
-          ,{" "}
-          <a href="/privacy" className="text-blue-500 hover:underline">
-            Privacy Policy
-          </a>
-          , and{" "}
-          <a href="/cookie-policy" className="text-blue-500 hover:underline">
-            Cookie Policy
-          </a>
-          .
-        </div>
-
         <button
-          type="submit" // Submit the form
-          id="submit-btn"
+          type="submit"
           className="w-full bg-blue-500 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
           Sign Up
