@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import logo from "../img/logo.png"
 const Navbar = () => {
   return (
     <div>
@@ -8,7 +9,8 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Left Side - Instagram Logo */}
           <div className="flex-shrink-0">
-            <span className="text-2xl font-bold text-gray-800">Instagram</span>
+            {/* <span className="text-2xl font-bold text-gray-800">Instagram</span> */}
+            <img src={logo} alt="logo" className="h-10 w-auto " />
           </div>
 
           {/* Right Side - Signup, Sign In, Profile */}

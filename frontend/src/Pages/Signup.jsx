@@ -4,7 +4,7 @@ import logo from "../img/logo.png";
 
 export default function Signup() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
       <img src={logo} alt="logo" className="h-12 w-auto mb-4" />
       <h1 className="text-2xl font-bold text-gray-800 mb-6">Create your account</h1>
       <form className="w-full max-w-sm bg-white p-6 rounded-lg shadow-md">
