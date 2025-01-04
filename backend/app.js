@@ -1,12 +1,20 @@
-const http = require("http");
+const express = require("express");
+const app = express();
+const PORT = 5000;
+const cors = require("cors");
+const data = require("./data")
 
 
+app.use(cors());
 
-const server = http.createServer((req, res) => {
-   console.log("server created");
-   res.end("helloworfd");
+app.get("/about", (req, res) => {
+    res.json("about page");
 });
 
-server.listen(5000,"localhost", () => {
-   console.log("server is running on port 5000");
+app.get("/", (req, res) => {
+    res.json(data);
+});
+
+app.listen(PORT, () => {
+    console.log("Server is running on" + PORT);    
 });
