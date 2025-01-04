@@ -5,6 +5,8 @@ import Home from "./Pages/Home";
 import Signin from "./Pages/Signin";
 import Signup from "./Pages/Signup";
 import Profile from "./Pages/Profile";
+import{ToastContainer} from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
 
 function App() {
   return (
@@ -18,6 +20,7 @@ function App() {
           <Route path="/profile" element={<Profile/>} />
 
         </Router>
+        <ToastContainer theme="dark"/>
       </BrowserRouter>
     </>
   );
