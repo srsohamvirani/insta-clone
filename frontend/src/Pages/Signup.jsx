@@ -1,18 +1,13 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../img/logo.png";
 
 export default function Signup() {
-  const fetchData = async () => {
-    const response = await fetch("http://localhost:5000/");{
-      const data = await response.json();
-      console.log(data);
-    }
-  };
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [userName, setUserName] = useState("");
+  const [password, setPassword] = useState("");
 
-  useEffect(() => {
-    fetchData();
-  }, []);
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
       <img src={logo} alt="logo" className="h-12 w-auto mb-4" />
