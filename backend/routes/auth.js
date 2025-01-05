@@ -12,8 +12,8 @@ router.get("/", (req, res) => {
 });
 
 
-router.get("createPost",requirelLogin, (req, res) => {
-    console.log("hello auth");
+router.get("/createPost",requirelLogin, (req, res) => {
+   return res.json({message: "Post created successfully"});
     
 });
 
