@@ -1,14 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const CreatePost = ({ userImage, userName }) => {
   const [body, setBody] = useState("");
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [url, setUrl] = useState("")
+
+  useEffect(() => {
+    if (url) {
+      postShare();
+    }
+  }, [url]);
+
+  
 
   // posting image to cloudinary
   const postDetails = () => {
-    console.log("Body:", body);
-    console.log("Selected Image:", image);
     const data = new FormData();
     data.append("file", image);
     data.append("upload_preset", "insta-clone");
@@ -17,11 +24,28 @@ const CreatePost = ({ userImage, userName }) => {
       method: "post",
       body: data,
     }).then((res) => res.json())
-    .then(data => console.log(data.url)) 
+    .then(data => setUrl(data.url)) 
     .catch(err => console.log(err))
     
-
   };
+  const postShare = () =>{
+    
+    fetch("http://localhost:5000/createpost", {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + localStorage.getItem("jwt"),
+  
+    },
+    body: JSON.stringify({
+      body,
+      pic: url,
+    }),
+  })
+    .then((res) => res.json())
+    .then((data) => console.log(data))
+    .catch((err) => console.log(err));
+  }
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
