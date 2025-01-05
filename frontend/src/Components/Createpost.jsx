@@ -1,14 +1,35 @@
 import React, { useState } from "react";
 
 const CreatePost = ({ userImage, userName }) => {
+  const [body, setBody] = useState("");
   const [image, setImage] = useState(null);
-  const [caption, setCaption] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
+
+  // posting image to cloudinary
+  const postDetails = () => {
+    console.log("Body:", body);
+    console.log("Selected Image:", image);
+    const data = new FormData();
+    data.append("file", image);
+    data.append("upload_preset", "insta-clone");
+    data.append("cloud_name", "dwj458at3");
+    fetch("https://api.cloudinary.com/v1_1/dwj458at3/image/upload", {
+      method: "post",
+      body: data,
+    }).then((res) => res.json())
+    .then(data => console.log(data.url)) 
+    .catch(err => console.log(err))
+    
+
+  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      console.log("File Selected:", file);
+      console.log("File Length:", e.target.files.length); // File input ke files count
       setImage(file);
+
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
@@ -17,28 +38,16 @@ const CreatePost = ({ userImage, userName }) => {
     }
   };
 
-  const handleCaptionChange = (e) => {
-    setCaption(e.target.value);
-  };
-
-  const handlePostSubmit = () => {
-    if (image && caption.trim()) {
-      alert("Post submitted!");
-      // Reset the form after posting
-      setImage(null);
-      setCaption("");
-      setImagePreview(null);
-    } else {
-      alert("Please add an image and a caption.");
-    }
-  };
-
   return (
     <div className="bg-white shadow-md rounded-lg overflow-hidden w-full max-w-md mx-auto mb-6 p-4">
       {/* User info and Share button */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center">
-          <img src={userImage} alt={userName} className="w-10 h-10 rounded-full object-cover" />
+          <img
+            src={userImage}
+            alt={userName}
+            className="w-10 h-10 rounded-full object-cover"
+          />
           <div className="ml-3">
             <h3 className="text-sm font-medium text-gray-900">{userName}</h3>
           </div>
@@ -46,8 +55,9 @@ const CreatePost = ({ userImage, userName }) => {
 
         {/* Share button */}
         <button
-          onClick={handlePostSubmit}
+          onClick={postDetails}
           className="bg-blue-500 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-blue-600"
+          id="post-button"
         >
           Share
         </button>
@@ -62,9 +72,16 @@ const CreatePost = ({ userImage, userName }) => {
           className="file-input hidden"
           id="file-input"
         />
-        <label htmlFor="file-input" className="cursor-pointer block w-full h-64 bg-gray-200 rounded-md flex justify-center items-center">
+        <label
+          htmlFor="file-input"
+          className="cursor-pointer block w-full h-64 bg-gray-200 rounded-md flex justify-center items-center"
+        >
           {imagePreview ? (
-            <img src={imagePreview} alt="Preview" className="w-full h-full object-cover rounded-md" />
+            <img
+              src={imagePreview}
+              alt="Preview"
+              className="w-full h-full object-cover rounded-md"
+            />
           ) : (
             <span className="text-gray-500">Click to choose an image</span>
           )}
@@ -74,8 +91,8 @@ const CreatePost = ({ userImage, userName }) => {
       {/* Caption input */}
       <div className="mb-4">
         <textarea
-          value={caption}
-          onChange={handleCaptionChange}
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
           placeholder="Write a caption..."
           className="w-full p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500"
         />
@@ -88,8 +105,8 @@ export default function Home() {
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col items-center p-4">
       <CreatePost
-        userImage="https://via.placeholder.com/150"  // Replace with the user's profile picture URL
-        userName="John Doe"  // Replace with the user's name
+        userImage="https://via.placeholder.com/150" // Replace with the user's profile picture URL
+        userName="John Doe" // Replace with the user's name
       />
     </div>
   );
