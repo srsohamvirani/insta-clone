@@ -14,7 +14,7 @@ export default function Profile() {
       <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-lg mb-6 flex justify-between items-center">
         <div className="flex items-center space-x-6">
           <img
-            src="https://via.placeholder.com/150"
+            src="https://images.pexels.com/photos/26903601/pexels-photo-26903601/free-photo-of-portrait-of-a-young-man-in-a-black-shirt.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load"
             alt="Profile"
             className="h-24 w-24 rounded-full object-cover"
           />
@@ -42,19 +42,19 @@ export default function Profile() {
         <div className="grid grid-cols-3 gap-4">
           {/* Post 1 */}
           <img
-            src="https://via.placeholder.com/400x400"
+            src="https://images.pexels.com/photos/2526882/pexels-photo-2526882.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
             alt="Post 1"
             className="w-full h-auto rounded-lg"
           />
           {/* Post 2 */}
           <img
-            src="https://via.placeholder.com/400x400"
+            src="https://images.pexels.com/photos/2176593/pexels-photo-2176593.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
             alt="Post 2"
             className="w-full h-auto rounded-lg"
           />
           {/* Post 3 */}
           <img
-            src="https://via.placeholder.com/400x400"
+            src="https://images.pexels.com/photos/2526882/pexels-photo-2526882.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
             alt="Post 3"
             className="w-full h-auto rounded-lg"
           />

@@ -3,10 +3,20 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const USER = mongoose.model("USER");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const {JWT_SECRET} = require("../keys");
+const requirelLogin = require("../middlewares/requirelLogin");
 
 router.get("/", (req, res) => {
   res.send("hello");
 });
+
+
+router.get("createPost",requirelLogin, (req, res) => {
+    console.log("hello auth");
+    
+});
+
 
 // ==========signup==================
 
@@ -54,8 +64,12 @@ router.post("/signin", (req, res) => {
     bcrypt
       .compare(password, savedUser.password)
       .then((match) => {
+
         if (match) {
-            return res.json({ message: "Signin successfully" });
+            // return res.json({ message: "Signin successfully" });
+            const token = jwt.sign({ _id: savedUser._id }, JWT_SECRET);
+            res.json(token);
+            console.log(token);
         } else {
           return res.status(422).json({ error: "Invalid password" });
         }

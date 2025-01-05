@@ -33,6 +33,9 @@ const Navbar = () => {
             >
               Profile
             </Link>
+            <Link to="/createPost">
+                Create Post       
+            </Link>
           </div>
         </div>
       </div>

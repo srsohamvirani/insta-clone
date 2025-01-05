@@ -7,6 +7,7 @@ import Signup from "./Pages/Signup";
 import Profile from "./Pages/Profile";
 import{ToastContainer} from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
+import Createpost from "./Components/Createpost";
 
 function App() {
   return (
@@ -18,6 +19,8 @@ function App() {
           <Route path="/signin" element={<Signin/>} />
           <Route path="/signup" element={<Signup/>} />
           <Route path="/profile" element={<Profile/>} />
+          <Route path="/createPost" element={<Createpost/>} />
+          
 
         </Router>
         <ToastContainer theme="dark"/>
