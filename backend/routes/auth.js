@@ -5,14 +5,14 @@ const USER = mongoose.model("USER");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const {JWT_SECRET} = require("../keys");
-const requirelLogin = require("../middlewares/requirelLogin");
+const requireLogin = require("../middlewares/requireLogin");
 
 router.get("/", (req, res) => {
   res.send("hello");
 });
 
 
-router.get("/createPost",requirelLogin, (req, res) => {
+router.get("/createPost",requireLogin, (req, res) => {
    return res.json({message: "Post created successfully"});
     
 });
