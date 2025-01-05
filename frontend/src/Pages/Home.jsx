@@ -1,13 +1,11 @@
 import React, { useState } from "react";
 
 const Post = ({ userImage, userName, postImage, initialLikes, initialComments }) => {
-  // State for like toggle (true/false)
   const [isLiked, setIsLiked] = useState(false);
   const [likes, setLikes] = useState(initialLikes);
   const [comments, setComments] = useState(initialComments);
   const [commentText, setCommentText] = useState("");
 
-  // Toggle like button
   const handleLike = () => {
     if (isLiked) {
       setLikes(likes - 1);
@@ -17,66 +15,81 @@ const Post = ({ userImage, userName, postImage, initialLikes, initialComments })
     setIsLiked(!isLiked);
   };
 
-  // Handle comment change
   const handleCommentChange = (event) => {
     setCommentText(event.target.value);
   };
 
-  // Handle comment submission
   const handleCommentSubmit = () => {
     if (commentText.trim()) {
       setComments(comments + 1);
-      setCommentText(""); // Clear comment input
+      setCommentText("");
     }
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md mb-4 max-w-sm mx-auto">
+    <div className="bg-white shadow-md rounded-lg overflow-hidden w-full max-w-md mx-auto mb-6">
       {/* Post Header */}
-      <div className="flex items-center mb-4">
+      <div className="flex items-center px-4 py-3">
         <img
           src={userImage}
           alt={userName}
-          className="h-10 w-10 rounded-full object-cover mr-3"
+          className="w-10 h-10 rounded-full object-cover"
         />
-        <span className="font-semibold text-gray-800">{userName}</span>
+        <div className="ml-3">
+          <h3 className="text-sm font-medium text-gray-900">{userName}</h3>
+        </div>
       </div>
 
       {/* Post Image */}
-      <img
-        src={postImage}
-        alt="post"
-        className="w-full h-auto rounded-lg mb-4"
-      />
+      <div className="relative">
+        <img src={postImage} alt="Post" className="w-full object-cover" />
+      </div>
 
-      {/* Post Footer (Likes and Comments) */}
-      <div className="flex items-center justify-between text-sm text-gray-600">
+      {/* Post Actions */}
+      <div className="px-4 py-3 space-y-3">
+        {/* Like and Comment */}
         <div className="flex items-center space-x-4">
-          {/* Like Button */}
-          <button onClick={handleLike} className="cursor-pointer">
-            {isLiked ? "❤️" : "🤍"} {likes} Likes
+          <button
+            onClick={handleLike}
+            className="flex items-center text-sm font-medium text-gray-600"
+          >
+            {isLiked ? (
+              <span className="text-red-500">❤️</span>
+            ) : (
+              <span className="text-gray-400">🤍</span>
+            )}
+            <span className="ml-1">{likes} Likes</span>
           </button>
-          {/* Comment Button */}
-          <span className="cursor-pointer">💬 {comments} Comments</span>
+          <div className="flex items-center text-sm font-medium text-gray-600">
+            <span>💬</span>
+            <span className="ml-1">{comments} Comments</span>
+          </div>
         </div>
-        <button className="text-blue-500 hover:underline">See more</button>
+
+        {/* Caption */}
+        <p className="text-sm text-gray-700">
+          A beautiful moment captured and shared!
+        </p>
       </div>
 
-      {/* Comment Box and Post Button */}
-      <div className="mt-4 flex items-center space-x-2">
-        <textarea
-          value={commentText}
-          onChange={handleCommentChange}
-          placeholder="Add a comment..."
-          className="w-full p-2 border border-gray-300 rounded-md"
-        />
-        <button
-          onClick={handleCommentSubmit}
-          className="bg-blue-500 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-blue-600"
-        >
-          Post
-        </button>
-      </div>
+      {/* Comment Section */}
+      <div className="border-t border-gray-200 px-4 py-3">
+  <div className="flex items-center space-x-3">
+    <textarea
+      value={commentText}
+      onChange={handleCommentChange}
+      placeholder="Add a comment..."
+      className="flex-1 rounded-md border border-gray-300 p-2 text-sm text-gray-800 focus:ring-2 focus:ring-blue-500 resize-none h-12"
+    />
+    <button
+      onClick={handleCommentSubmit}
+      className="bg-blue-500 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-blue-600"
+    >
+      Post
+    </button>
+  </div>
+</div>
+
     </div>
   );
 };
@@ -84,7 +97,6 @@ const Post = ({ userImage, userName, postImage, initialLikes, initialComments })
 export default function Home() {
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col items-center p-4">
-      {/* Sample Posts */}
       <Post
         userImage="https://via.placeholder.com/150"
         userName="John Doe"

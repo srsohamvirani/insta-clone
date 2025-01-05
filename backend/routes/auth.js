@@ -8,6 +8,8 @@ router.get("/", (req, res) => {
   res.send("hello");
 });
 
+// ==========signup==================
+
 router.post("/signup", (req, res) => {
   const { name, userName, email, password } = req.body;
   if (!name || !userName || !email || !password) {
@@ -36,6 +38,31 @@ router.post("/signup", (req, res) => {
           console.log(err);
         });
     });
+  });
+});
+// ==========signin==================
+
+router.post("/signin", (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(422).json({ error: "please add email or password" });
+  }
+  USER.findOne({ email: email }).then((savedUser) => {
+    if (!savedUser) {
+      return res.status(422).json({ error: "Invalid email " });
+    }
+    bcrypt
+      .compare(password, savedUser.password)
+      .then((match) => {
+        if (match) {
+            return res.json({ message: "Signin successfully" });
+        } else {
+          return res.status(422).json({ error: "Invalid password" });
+        }
+      })
+        .catch((err) => {
+            console.log(err);
+        });
   });
 });
 
