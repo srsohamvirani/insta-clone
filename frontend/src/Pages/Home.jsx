@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+
+
 const Post = ({ userImage, userName, postImage, initialLikes, initialComments }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [likes, setLikes] = useState(initialLikes);

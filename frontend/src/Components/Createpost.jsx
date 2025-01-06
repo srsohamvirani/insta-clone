@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
+import {toast} from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const CreatePost = ({ userImage, userName }) => {
   const [body, setBody] = useState("");
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [url, setUrl] = useState("")
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     if (url) {
@@ -13,6 +17,9 @@ const CreatePost = ({ userImage, userName }) => {
   }, [url]);
 
   
+    // Toast functions
+    const notifyA = (msg) => toast.error(msg);
+    const notifyB = (msg) => toast.success(msg);
 
   // posting image to cloudinary
   const postDetails = () => {
@@ -43,7 +50,13 @@ const CreatePost = ({ userImage, userName }) => {
     }),
   })
     .then((res) => res.json())
-    .then((data) => console.log(data))
+    .then((data) => {if(data.error){
+      notifyA(data.error)
+    }else{
+      notifyB("Successfully Posted")
+      navigate("/")
+    }
+    })
     .catch((err) => console.log(err));
   }
 
