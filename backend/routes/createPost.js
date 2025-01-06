@@ -18,25 +18,17 @@ router.get("/allPosts",requireLogin, (req, res) => {
         })
 });
 
-// Route
-router.post("/createPost",requireLogin, (req, res) => {
-    const { body, pic } = req.body;
-    if (!body || !pic) {
-        return res.status(422).json({ error: "Please add all the fields" });
-    }
-    console.log(req.user);
-    
-    const post = new POST({
-        body,
-        photo: pic,
-        postedBy: req.user
-    })
-    post.save().then(result => {
-        res.status(200).json({ post: result,message:"Post Created Successfully" })
-    }).catch(err => {
-        console.log(err)
-    })
+// Route to get the user's posts
+router.get("/myposts", requireLogin, (req, res) => {
+    POST.find({ postedBy: req.user._id })
+        .populate("postedBy", "_id name")
+        .then(myposts => {
+            res.json({ myposts });
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({ error: "Failed to load user's posts" });
+        });
 });
-   
 
 module.exports = router

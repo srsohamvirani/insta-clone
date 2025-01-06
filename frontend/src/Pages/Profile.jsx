@@ -1,6 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export default function Profile() {
+  const [pic, setPic] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/allposts", {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("jwt"),
+      },
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        setPic(result.posts); // Assuming `result.posts` contains the post data
+      })
+      .catch((err) => {
+        console.error("Error fetching posts:", err);
+      });
+  }, []);
+
   const [isFollowing, setIsFollowing] = useState(false);
 
   // Handle follow/unfollow toggle
@@ -40,25 +57,17 @@ export default function Profile() {
       <div className="w-full max-w-lg bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-xl font-semibold text-gray-800 mb-4">Posts</h2>
         <div className="grid grid-cols-3 gap-4">
-          {/* Post 1 */}
-          <img
-            src="https://images.pexels.com/photos/2526882/pexels-photo-2526882.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-            alt="Post 1"
-            className="w-full h-auto rounded-lg"
-          />
-          {/* Post 2 */}
-          <img
-            src="https://images.pexels.com/photos/2176593/pexels-photo-2176593.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-            alt="Post 2"
-            className="w-full h-auto rounded-lg"
-          />
-          {/* Post 3 */}
-          <img
-            src="https://images.pexels.com/photos/2526882/pexels-photo-2526882.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-            alt="Post 3"
-            className="w-full h-auto rounded-lg"
-          />
-          {/* Add more posts as needed */}
+          {pic.map((pics) => {
+            return (
+              <div key={pics._id} className="relative w-full h-0 pb-[100%]">
+                <img
+                  src={pics.photo}
+                  alt="Post"
+                  className="absolute top-0 left-0 w-full h-full object-cover rounded-lg"
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
