@@ -1,6 +1,48 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
+export default function Home() {
+  const navigate = useNavigate();
+  const [data, setData] = useState([]);
 
+  console.log(data);
+  
+
+  useEffect(() => { 
+    const token = localStorage.getItem("jwt");
+    if (!token) {
+      navigate("/signup");
+    }
+    // Fetvhing all posts
+    fetch("http://localhost:5000/allposts", {
+      headers: {
+        "Authorization": "Bearer " + localStorage.getItem("jwt"),
+      },
+    }).then((res) => res.json())
+    .then(result => setData(result))
+    .catch(err => console.log(err))
+
+  }, []);
+
+   return (
+    <div className="bg-gray-100 min-h-screen flex flex-col items-center p-4">
+      <Post
+        userImage="https://via.placeholder.com/150"
+        userName="John Doe"
+        postImage="https://images.pexels.com/photos/2526882/pexels-photo-2526882.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+        initialLikes={120}
+        initialComments={5}
+      />
+      <Post
+        userImage="https://via.placeholder.com/150"
+        userName="Jane Smith"
+        postImage="https://images.pexels.com/photos/2176593/pexels-photo-2176593.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+        initialLikes={230}
+        initialComments={15}
+      />
+    </div>
+  );
+}
 
 const Post = ({ userImage, userName, postImage, initialLikes, initialComments }) => {
   const [isLiked, setIsLiked] = useState(false);
@@ -24,6 +66,8 @@ const Post = ({ userImage, userName, postImage, initialLikes, initialComments })
 
   return (
     <div className="bg-white shadow-md rounded-lg overflow-hidden w-full max-w-md mx-auto mb-6">
+    
+      <div>
       <div className="flex items-center px-4 py-3">
         <img src={userImage} alt={userName} className="w-10 h-10 rounded-full object-cover" />
         <div className="ml-3">
@@ -65,27 +109,8 @@ const Post = ({ userImage, userName, postImage, initialLikes, initialComments })
           </button>
         </div>
       </div>
+      </div>
     </div>
   );
 };
 
-export default function Home() {
-  return (
-    <div className="bg-gray-100 min-h-screen flex flex-col items-center p-4">
-      <Post
-        userImage="https://via.placeholder.com/150"
-        userName="John Doe"
-        postImage="https://images.pexels.com/photos/2526882/pexels-photo-2526882.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-        initialLikes={120}
-        initialComments={5}
-      />
-      <Post
-        userImage="https://via.placeholder.com/150"
-        userName="Jane Smith"
-        postImage="https://images.pexels.com/photos/2176593/pexels-photo-2176593.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-        initialLikes={230}
-        initialComments={15}
-      />
-    </div>
-  );
-}

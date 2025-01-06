@@ -2,12 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import logo from "../img/logo.png";
 
-const Navbar = () => {
-
+export default function Navbar({login}) {
+  
   // loginStatus function ko component ke andar define kiya hai
   const loginStatus = () => {
     const token = localStorage.getItem("jwt");
-    if (token) {
+    if (login || token) {
       return [
         <>
             <Link
@@ -61,7 +61,6 @@ const Navbar = () => {
         </div>
       </nav>
     </div>
-  );
+  )
 }
 
-export default Navbar;

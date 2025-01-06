@@ -1,5 +1,6 @@
 import "./App.css";
 import { BrowserRouter, Route, Routes as Router } from "react-router-dom";
+import React, { createContext, useState } from "react";
 import Navbar from "./Pages/Navbar";
 import Home from "./Pages/Home";
 import Signin from "./Pages/Signin";
@@ -8,12 +9,16 @@ import Profile from "./Pages/Profile";
 import{ToastContainer} from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import Createpost from "./Components/Createpost";
+import { LoginContext } from "./context/LoginContext";
+
 
 function App() {
+  const [user, setUserLogin] = useState(false);
   return (
     <>
       <BrowserRouter>
-        <Navbar />
+      <LoginContext.Provider value={{setUserLogin}}>
+      <Navbar login={user}/>
         <Router>
           <Route path="/" element={<Home/>} />
           <Route path="/signin" element={<Signin/>} />
@@ -24,6 +29,8 @@ function App() {
 
         </Router>
         <ToastContainer theme="dark"/>
+      </LoginContext.Provider>
+   
       </BrowserRouter>
     </>
   );
