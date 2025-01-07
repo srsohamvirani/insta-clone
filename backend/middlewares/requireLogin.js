@@ -14,8 +14,8 @@ module.exports = (req, res, next) => {
     console.log(JWT_SECRET);
     
     jwt.verify(token, JWT_SECRET, async (err, payload) => {
-         console.log(err);
         if (err) {
+            console.log(err);
             return res.status(401).json({ error: "You must have logged in 2" })
           
         }

@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from "react";
-import {toast} from "react-toastify";
+import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 const CreatePost = ({ userImage, userName }) => {
   const [body, setBody] = useState("");
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  const [url, setUrl] = useState("")
+  const [url, setUrl] = useState("");
   const navigate = useNavigate();
-
 
   useEffect(() => {
     if (url) {
@@ -16,10 +15,9 @@ const CreatePost = ({ userImage, userName }) => {
     }
   }, [url]);
 
-  
-    // Toast functions
-    const notifyA = (msg) => toast.error(msg);
-    const notifyB = (msg) => toast.success(msg);
+  // Toast functions
+  const notifyA = (msg) => toast.error(msg);
+  const notifyB = (msg) => toast.success(msg);
 
   // posting image to cloudinary
   const postDetails = () => {
@@ -30,41 +28,40 @@ const CreatePost = ({ userImage, userName }) => {
     fetch("https://api.cloudinary.com/v1_1/dwj458at3/image/upload", {
       method: "post",
       body: data,
-    }).then((res) => res.json())
-    .then(data => setUrl(data.url)) 
-    .catch(err => console.log(err))
-    
-  };
-  const postShare = () =>{
-    
-    fetch("http://localhost:5000/createpost", {
-    method: "post",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + localStorage.getItem("jwt"),
-  
-    },
-    body: JSON.stringify({
-      body,
-      pic: url,
-    }),
-  })
-    .then((res) => res.json())
-    .then((data) => {if(data.error){
-      notifyA(data.error)
-    }else{
-      notifyB("Successfully Posted")
-      navigate("/")
-    }
     })
-    .catch((err) => console.log(err));
-  }
+      .then((res) => res.json())
+      .then((data) => setUrl(data.url))
+      .catch((err) => console.log(err));
+  };
+
+  const postShare = () => {
+    fetch("http://localhost:5000/createpost", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("jwt"),
+      },
+      body: JSON.stringify({
+        body,
+        pic: url,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          notifyA(data.error);
+        } else {
+          notifyB("Successfully Posted");
+          navigate("/");
+        }
+      })
+      .catch((err) => console.log(err));
+  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       console.log("File Selected:", file);
-      console.log("File Length:", e.target.files.length); // File input ke files count
       setImage(file);
 
       const reader = new FileReader();
