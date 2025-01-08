@@ -201,8 +201,7 @@
 //   );
 // };  
 
-
-
+// ===========bus=================
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -259,15 +258,15 @@ const Post = ({ userImage, userName, postImage, postId, initialLikes, initialCom
   const [likes, setLikes] = useState(initialLikes.length);
   const [comments, setComments] = useState(initialComments);
   const [commentText, setCommentText] = useState("");
+  const [showCommentsModal, setShowCommentsModal] = useState(false);
 
   // Optimistic UI update for like/unlike
   const handleLike = () => {
     const newIsLiked = !isLiked;
     const newLikes = newIsLiked ? likes + 1 : likes - 1;
     setIsLiked(newIsLiked);
-    setLikes(newLikes); // Update likes immediately
+    setLikes(newLikes);
 
-    // Optimistically update the UI and send request to the server
     fetch(newIsLiked ? "http://localhost:5000/like" : "http://localhost:5000/unlike", {
       method: "PUT",
       headers: {
@@ -278,7 +277,6 @@ const Post = ({ userImage, userName, postImage, postId, initialLikes, initialCom
     })
       .then((res) => res.json())
       .then((result) => {
-        // Update state based on server response
         if (result.likes) {
           setLikes(result.likes.length);
           setIsLiked(result.likes.includes(JSON.parse(localStorage.getItem("user"))._id));
@@ -286,9 +284,8 @@ const Post = ({ userImage, userName, postImage, postId, initialLikes, initialCom
       })
       .catch((err) => {
         console.log("Error updating like/unlike:", err);
-        // Rollback on error
         setIsLiked(!newIsLiked);
-        setLikes(likes); // Rollback likes count if the request fails
+        setLikes(likes);
       });
   };
 
@@ -296,8 +293,47 @@ const Post = ({ userImage, userName, postImage, postId, initialLikes, initialCom
 
   const handleCommentSubmit = () => {
     if (commentText.trim()) {
-      setComments(comments + 1);
-      setCommentText("");
+      const newComment = {
+        text: commentText,
+        postedBy: JSON.parse(localStorage.getItem("user")), // Get the user info from localStorage
+      };
+
+      // Log the data that will be sent to the backend
+      console.log("Data being sent to backend:", {
+        postId,
+        text: commentText,
+      });
+
+      // Optimistic UI update: add the new comment locally
+      const updatedComments = [...comments, newComment];
+      setComments(updatedComments); // Update the comment section immediately
+      setCommentText(""); // Clear the input field
+
+      // Send the comment to the backend to be saved and updated
+      fetch("http://localhost:5000/comment", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("jwt"),
+        },
+        body: JSON.stringify({ postId, text: commentText }),
+      })
+        .then((res) => res.json())
+        .then((result) => {
+          if (result.comments) {
+            // If the backend returns updated comments, use them to overwrite the UI
+            setComments(result.comments);
+          } else {
+            console.error("No comments returned:", result);
+          }
+        })
+        .catch((err) => {
+          console.error("Error submitting comment:", err);
+          alert("Failed to submit comment. Please try again.");
+
+          // Revert the optimistic update if the request fails
+          setComments(comments); // Revert to previous state if failed
+        });
     }
   };
 
@@ -315,7 +351,7 @@ const Post = ({ userImage, userName, postImage, postId, initialLikes, initialCom
       </div>
 
       <div className="relative">
-        <div className="relative w-full h-0 pb-[56.25%]">
+        <div className="relative w-full h-0 pb-[100%]">
           <img
             src={postImage || "https://via.placeholder.com/300"}
             alt="Post"
@@ -326,24 +362,26 @@ const Post = ({ userImage, userName, postImage, postId, initialLikes, initialCom
 
       <div className="px-4 py-3 space-y-3">
         <div className="flex items-center space-x-4">
-          <button
-            onClick={handleLike}
-            className="flex items-center text-sm font-medium text-gray-600"
-          >
-            {isLiked ? <span className="text-red-500">❤️</span> : <span>🤍</span>}
+          <button onClick={handleLike} className="flex items-center text-sm font-medium text-gray-600">
+            {isLiked ? <span className="text-red-500 text-lg">❤️</span> : <span className="text-lg">🤍</span>}
             <span className="ml-1">{likes} Likes</span>
           </button>
           <div className="flex items-center text-sm font-medium text-gray-600">
-            <span>💬</span>
-            <span className="ml-1">{comments} Comments</span>
+            <span className="text-lg">💬</span>
+            <span
+              className="ml-1 cursor-pointer text-blue-500"
+              onClick={() => setShowCommentsModal(true)}
+            >
+              {comments.length > 0 ? "View all comments" : "No comments yet."}
+            </span>
           </div>
         </div>
         <p className="text-sm text-gray-700">{caption || "No caption available"}</p>
       </div>
 
-      <div className="border-t border-gray-200 px-4 py-3">
-        <div className="flex items-center space-x-3 w-full">
-          <textarea
+      <div className="px-4 py-3">
+        <div className="flex items-center space-x-3 w-full mt-3">
+          <input
             value={commentText}
             onChange={handleCommentChange}
             placeholder="Add a comment..."
@@ -357,6 +395,75 @@ const Post = ({ userImage, userName, postImage, postId, initialLikes, initialCom
           </button>
         </div>
       </div>
+
+      {/* Comments Modal */}
+      {showCommentsModal && (
+  <div className="fixed inset-0 bg-gray-800 bg-opacity-50 z-10 flex justify-center items-center">
+    <div className="bg-white rounded-lg overflow-hidden w-10/12 max-w-3xl p-6 relative">
+      {/* Close Button at the Top Right */}
+      <button
+        onClick={() => setShowCommentsModal(false)}
+        className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl"
+      >
+        &times;
+      </button>
+
+      <div className="flex mt-6">
+        {/* Image Section, with margin-top to move it down */}
+        <div className="w-1/2 pr-4 flex items-center justify-center">
+          <div className="relative w-full h-0 pb-[100%]">
+            <img
+              src={postImage || "https://via.placeholder.com/300"}
+              alt="Post"
+              className="absolute top-0 left-0 w-full h-full object-cover rounded-lg shadow-md"
+            />
+          </div>
+        </div>
+
+        {/* Comments Section */}
+        <div className="w-1/2 pl-4 flex flex-col justify-between max-h-[60vh]">
+          <div className="space-y-4 overflow-y-auto" style={{ maxHeight: '300px' }}>
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">Comments</h3>
+
+            {/* Comment List */}
+            <div className="space-y-4">
+              {comments.map((comment) => (
+                <div key={comment._id} className="flex items-center space-x-3">
+                  <img
+                    src={comment.postedBy.pic || "https://via.placeholder.com/150"}
+                    alt={comment.postedBy.name || "User"}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-800">{comment.postedBy.name}</p>
+                    <p className="text-sm text-gray-600">{comment.text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Comment Input Section */}
+          <div className="flex items-center space-x-3 mt-6">
+            <input
+              value={commentText}
+              onChange={handleCommentChange}
+              placeholder="Add a comment..."
+              className="flex-1 rounded-md border border-gray-300 p-2 text-sm text-gray-800 focus:ring-2 focus:ring-blue-500 resize-none"
+            />
+            <button
+              onClick={handleCommentSubmit}
+              className="bg-blue-500 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-blue-600"
+            >
+              Post
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+      
     </div>
   );
 };

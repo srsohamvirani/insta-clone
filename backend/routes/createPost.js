@@ -6,11 +6,9 @@ const POST = mongoose.model("POST");
 
 router.post("/createPost", requireLogin, (req, res) => {
   const { body, pic } = req.body;
-  console.log(pic);
   if (!body || !pic) {
     return res.status(422).json({ error: "Please add all the fields" });
   }
-  console.log(req.user);
   const post = new POST({
     body,
     photo: pic,
@@ -23,7 +21,7 @@ router.post("/createPost", requireLogin, (req, res) => {
     })
     .catch((err) => console.log(err));
 });
-// Route
+
 router.get("/allPosts", requireLogin, (req, res) => {
   POST.find()
     .populate("postedBy", "_id name")
@@ -35,7 +33,6 @@ router.get("/allPosts", requireLogin, (req, res) => {
     });
 });
 
-// Route to get the user's posts
 router.get("/myposts", requireLogin, (req, res) => {
   POST.find({ postedBy: req.user._id })
     .populate("postedBy", "_id name")
@@ -50,8 +47,6 @@ router.get("/myposts", requireLogin, (req, res) => {
 
 router.put("/like", requireLogin, async (req, res) => {
   try {
-    console.log("🚀 ~ router.put ~ req.body.postId:", req.body.postId);
-
     const result = await POST.findByIdAndUpdate(
       { _id: req.body.postId },
       {
@@ -62,7 +57,6 @@ router.put("/like", requireLogin, async (req, res) => {
       }
     );
 
-    console.log("🚀 ~ router.put ~ result:", result)
     if (!result) {
       return res.status(404).json({ error: "Post not found" });
     }
@@ -75,30 +69,53 @@ router.put("/like", requireLogin, async (req, res) => {
 });
 
 router.put("/unlike", requireLogin, async (req, res) => {
-    try {
-      console.log("🚀 ~ router.put ~ req.body.postId:", req.body.postId);
-      console.log("🚀 ~ router.put ~ req.user._id:", req.user._id);
-  
-      const result = await POST.findByIdAndUpdate(
-        req.body.postId, // Find post by ID
-        {
-          $pull: { likes: req.user._id }, // Remove user ID from likes array
-        },
-        {
-          new: true, // Return the updated document
-        }
-      );
-  
-      console.log("🚀 ~ router.put ~ result:", result)
-      if (!result) {
-        return res.status(404).json({ error: "Post not found" });
+  try {
+    const result = await POST.findByIdAndUpdate(
+      req.body.postId, // Find post by ID
+      {
+        $pull: { likes: req.user._id }, // Remove user ID from likes array
+      },
+      {
+        new: true, // Return the updated document
       }
-  
-      res.json(result);
-    } catch (err) {
-      console.error(err);
-      res.status(422).json({ error: err.message });
+    );
+
+    if (!result) {
+      return res.status(404).json({ error: "Post not found" });
     }
-  });
-  
+
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(422).json({ error: err.message });
+  }
+});
+
+// =================== Comment ===================
+
+router.put("/comment", requireLogin, async (req, res) => {
+  const comment = {
+    text: req.body.text,
+    postedBy: req.user._id, // Attach the user's ID
+  };
+
+  try {
+    const updatedPost = await POST.findByIdAndUpdate(
+      req.body.postId,
+      {
+        $push: { comments: comment }, // Add the new comment to the post's comment array
+      },
+      { new: true }
+    ).populate("comments.postedBy", "name pic _id"); // Populate the postedBy field with user info
+
+    if (!updatedPost) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    res.json(updatedPost); // Send back the updated post with populated comments
+  } catch (err) {
+    return res.status(422).json({ error: err.message });
+  }
+});
+
 module.exports = router;
