@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
+import PostDetail from "./PostDetail"; // Import the PostDetail component
 
 export default function Profile() {
   const [pic, setPic] = useState([]);
+  const [show, setShow] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [isFollowing, setIsFollowing] = useState(false);
 
   useEffect(() => {
     fetch("http://localhost:5000/allposts", {
@@ -18,11 +22,17 @@ export default function Profile() {
       });
   }, []);
 
-  const [isFollowing, setIsFollowing] = useState(false);
+  const toggleDetails = (post) => {
+    setSelectedPost(post);
+    setShow(!show);
+  };
 
-  // Handle follow/unfollow toggle
   const handleFollowToggle = () => {
     setIsFollowing(!isFollowing);
+  };
+
+  const handleDeletePost = (postId) => {
+    setPic((prevPic) => prevPic.filter((post) => post._id !== postId));
   };
 
   return (
@@ -57,19 +67,23 @@ export default function Profile() {
       <div className="w-full max-w-lg bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-xl font-semibold text-gray-800 mb-4">Posts</h2>
         <div className="grid grid-cols-3 gap-4">
-          {pic.map((pics) => {
-            return (
-              <div key={pics._id} className="relative w-full h-0 pb-[100%]">
-                <img
-                  src={pics.photo}
-                  alt="Post"
-                  className="absolute top-0 left-0 w-full h-full object-cover rounded-lg"
-                />
-              </div>
-            );
-          })}
+          {pic.map((post) => (
+            <div key={post._id} className="relative w-full h-0 pb-[100%]">
+              <img
+                src={post.photo}
+                onClick={() => toggleDetails(post)}
+                alt="Post"
+                className="absolute top-0 left-0 w-full h-full object-cover rounded-lg cursor-pointer"
+              />
+            </div>
+          ))}
         </div>
       </div>
+
+      {/* Post Detail Modal */}
+      {show && selectedPost && (
+        <PostDetail post={selectedPost} onClose={() => setShow(false)} onDelete={handleDeletePost} />
+      )}
     </div>
   );
 }

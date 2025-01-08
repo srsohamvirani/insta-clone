@@ -265,7 +265,7 @@ const CreatePost = ({ userImage, userName }) => {
               className="absolute top-0 left-0 w-full h-full object-cover rounded-md"
             />
           ) : (
-            <span className="text-gray-500 absolute">Click to choose an image</span>
+            <span className="text-gray-500 absolute top-[50%]">Click to choose an image</span>
           )}
         </label>
       </div>
