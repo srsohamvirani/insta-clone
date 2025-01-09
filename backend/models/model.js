@@ -20,6 +20,9 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    Photo: {
+        type: String,
+    },
     followers: [{ type:ObjectId, ref: "USER" }],
     following: [{ type: ObjectId, ref: "USER" }],
 });

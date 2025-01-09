@@ -169,4 +169,18 @@ router.delete("/deletePost/:postId", requireLogin, async (req, res) => {
   }
 });
 
+// to showing following post
+router.get("/myfollowingpost", requireLogin, async (req, res) => {
+    POST.find({ postedBy: { $in: req.user.following } })
+        .populate("postedBy", "_id name")
+        .populate("comments.postedBy", "_id name pic")
+        .sort("-createdAt")
+        .then((posts) => {
+            res.json({ posts });
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+})
+
 module.exports = router;

@@ -6,6 +6,32 @@ const USER = mongoose.model("USER");
 const requireLogin = require("../middlewares/requireLogin");
 
 
+// Fetch current user's profile, posts, followers, and following details
+router.get('/myprofile', requireLogin, async (req, res) => {
+    try {
+        const user = await USER.findOne({ _id: req.user._id })
+            .populate('followers', '_id name pic')
+            .populate('following', '_id name pic');
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const posts = await POST.find({ postedBy: req.user._id })
+            .populate("postedBy", "_id name userName email")
+            .populate({
+                path: "comments.postedBy",
+                select: "_id name userName",
+            });
+
+        return res.status(200).json({ user, posts });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: "An error occurred" });
+    }
+});
+
+
+
 // to get user profile
 router.get("/user/:id", async (req, res) => {
     try {

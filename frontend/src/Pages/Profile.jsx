@@ -1,24 +1,27 @@
 import React, { useEffect, useState } from "react";
 import PostDetail from "./PostDetail"; // Import the PostDetail component
+import ProfilePic from "./ProfilePic";
 
 export default function Profile() {
-  const [pic, setPic] = useState([]);
+  const [user, setUser] = useState({});
+  const [posts, setPosts] = useState([]);
   const [show, setShow] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
-  const [isFollowing, setIsFollowing] = useState(false);
+  const [changePic, setChangePic] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:5000/allposts", {
+    fetch("http://localhost:5000/myprofile", {
       headers: {
         Authorization: "Bearer " + localStorage.getItem("jwt"),
       },
     })
       .then((res) => res.json())
       .then((result) => {
-        setPic(result.posts); // Assuming `result.posts` contains the post data
+        setUser(result.user);
+        setPosts(result.posts);
       })
       .catch((err) => {
-        console.error("Error fetching posts:", err);
+        console.error("Error fetching profile data:", err);
       });
   }, []);
 
@@ -27,12 +30,12 @@ export default function Profile() {
     setShow(!show);
   };
 
-  const handleFollowToggle = () => {
-    setIsFollowing(!isFollowing);
+  const changeProfile = () => {
+    setChangePic(!changePic);
   };
 
   const handleDeletePost = (postId) => {
-    setPic((prevPic) => prevPic.filter((post) => post._id !== postId));
+    setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId));
   };
 
   return (
@@ -41,44 +44,36 @@ export default function Profile() {
       <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl mb-6 flex flex-col md:flex-row justify-between items-center">
         <div className="flex items-center space-x-6 mb-4 md:mb-0">
           <img
-            src="https://images.pexels.com/photos/26903601/pexels-photo-26903601/free-photo-of-portrait-of-a-young-man-in-a-black-shirt.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load"
+            onClick={changeProfile}
+            src={user.pic || "https://via.placeholder.com/150"}
             alt="Profile"
             className="h-24 w-24 rounded-full object-cover border-4 border-blue-500"
           />
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">John Doe</h1>
+            <h1 className="text-3xl font-bold text-gray-800">{user.name || "User"}</h1>
             <div className="text-sm text-gray-600 mt-2 flex space-x-4">
               <div className="flex flex-col items-center">
-                <span className="font-semibold text-gray-800">120</span>
+                <span className="font-semibold text-gray-800">{posts.length}</span>
                 <span>Posts</span>
               </div>
               <div className="flex flex-col items-center">
-                <span className="font-semibold text-gray-800">1.2K</span>
+                <span className="font-semibold text-gray-800">{user.followers?.length || 0}</span>
                 <span>Followers</span>
               </div>
               <div className="flex flex-col items-center">
-                <span className="font-semibold text-gray-800">180</span>
+                <span className="font-semibold text-gray-800">{user.following?.length || 0}</span>
                 <span>Following</span>
               </div>
             </div>
           </div>
         </div>
-        {/* Follow/Unfollow Button */}
-        <button
-          onClick={handleFollowToggle}
-          className={`${
-            isFollowing ? "bg-red-500 text-white" : "bg-blue-500 text-white"
-          } py-2 px-6 rounded-full text-sm font-medium hover:bg-red-600 focus:outline-none transition duration-300 transform hover:scale-105`}
-        >
-          {isFollowing ? "Unfollow" : "Follow"}
-        </button>
       </div>
 
       {/* User Posts Section */}
       <div className="w-full max-w-2xl bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Posts</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          {pic.map((post) => (
+          {posts.map((post) => (
             <div key={post._id} className="relative w-full h-0 pb-[100%] group">
               <img
                 src={post.photo}
@@ -109,6 +104,7 @@ export default function Profile() {
       {show && selectedPost && (
         <PostDetail post={selectedPost} onClose={() => setShow(false)} onDelete={handleDeletePost} />
       )}
+      {changePic && <ProfilePic onClose={() => setChangePic(false)} />}
     </div>
   );
 }

@@ -12,6 +12,7 @@ import Createpost from "./Components/Createpost";
 import { LoginContext } from "./context/LoginContext";
 import Modal from "./Pages/Modal";
 import UserProfile from "./Pages/UserProfile";
+import MyFollowingPost from "./Pages/MyFollowingPost";
 
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
           <Route exact path="/profile" element={<Profile/>} />
           <Route path="/createPost" element={<Createpost/>} />
           <Route path="/profile/:userid" element={<UserProfile/>} />
+          <Route path="/followingpost" element={<MyFollowingPost/>} />
           
 
         </Router>
