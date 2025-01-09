@@ -123,6 +123,26 @@ router.put("/comment", requireLogin, async (req, res) => {
   }
 });
 
+// ===================Api to Delete Comment ===================
+router.delete("/deletecomment/:postId/:commentId", requireLogin, async (req, res) => {
+  try {
+    const updatedPost = await POST.findByIdAndUpdate(
+      req.params.postId,
+      {
+        $pull: { comments: { _id: req.params.commentId, postedBy: req.user._id } },
+      },
+      { new: true }
+    ).populate("comments.postedBy", "_id name pic");
+
+    if (!updatedPost) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    res.json(updatedPost); // Send back the updated post with populated comments
+  } catch (err) {
+    return res.status(422).json({ error: err.message });
+  }
+});
 // ===================Api to Delete Post ===================
 router.delete("/deletePost/:postId", requireLogin, async (req, res) => {
   try {

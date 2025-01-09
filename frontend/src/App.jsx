@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css"
 import Createpost from "./Components/Createpost";
 import { LoginContext } from "./context/LoginContext";
 import Modal from "./Pages/Modal";
+import UserProfile from "./Pages/UserProfile";
 
 
 function App() {
@@ -25,8 +26,9 @@ function App() {
           <Route path="/" element={<Home/>} />
           <Route path="/signin" element={<Signin/>} />
           <Route path="/signup" element={<Signup/>} />
-          <Route path="/profile" element={<Profile/>} />
+          <Route exact path="/profile" element={<Profile/>} />
           <Route path="/createPost" element={<Createpost/>} />
+          <Route path="/profile/:userid" element={<UserProfile/>} />
           
 
         </Router>
