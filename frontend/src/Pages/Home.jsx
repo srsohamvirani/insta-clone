@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FaHeart, FaRegHeart, FaComment, FaTrash } from "react-icons/fa";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Home() {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [commentToDelete, setCommentToDelete] = useState(null);
+  const [postToDelete, setPostToDelete] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("jwt");
@@ -56,23 +59,67 @@ export default function Home() {
       });
   };
 
+  const handleDeletePost = (postId) => {
+    fetch(`http://localhost:5000/deletePost/${postId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("jwt"),
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then((error) => {
+            throw new Error(error.error || "Failed to delete post");
+          });
+        }
+        return res.json();
+      })
+      .then((result) => {
+        if (result.message) {
+          toast.success("Post deleted successfully!");
+          setData((prevData) => prevData.filter((post) => post._id !== postId));
+          setPostToDelete(null);
+        } else {
+          console.error("Failed to delete post:", result);
+          toast.error("Failed to delete post. Please try again.");
+        }
+      })
+      .catch((err) => {
+        console.error("Error deleting post:", err);
+        toast.error("Oops! Something went wrong while deleting the post.");
+      });
+  };
+
   const confirmDeleteComment = (postId, commentId) => {
     setCommentToDelete({ postId, commentId });
   };
 
-  const handleConfirmDelete = () => {
+  const confirmDeletePost = (postId) => {
+    setPostToDelete(postId);
+  };
+
+  const handleConfirmDeleteComment = () => {
     if (commentToDelete) {
       handleDeleteComment(commentToDelete.postId, commentToDelete.commentId);
       setCommentToDelete(null);
     }
   };
 
+  const handleConfirmDeletePost = () => {
+    if (postToDelete) {
+      handleDeletePost(postToDelete);
+      setPostToDelete(null);
+    }
+  };
+
   const handleCancelDelete = () => {
     setCommentToDelete(null);
+    setPostToDelete(null);
   };
 
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col items-center p-4">
+      <ToastContainer />
       {data.length > 0 ? (
         data.map((post, index) => (
           <Post
@@ -86,6 +133,7 @@ export default function Home() {
             initialComments={post.comments}
             caption={post.body}
             confirmDeleteComment={confirmDeleteComment}
+            confirmDeletePost={confirmDeletePost}
           />
         ))
       ) : (
@@ -93,11 +141,13 @@ export default function Home() {
       )}
 
       {/* Delete Confirmation Modal */}
-      {commentToDelete && (
+      {(commentToDelete || postToDelete) && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 z-10 flex justify-center items-center">
           <div className="bg-white rounded-lg overflow-hidden w-full max-w-md p-6 relative mx-4 sm:mx-0">
             <h3 className="text-xl font-semibold text-gray-800 mb-4">Confirm Delete</h3>
-            <p className="text-gray-600 mb-6">Are you sure you want to delete this comment?</p>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete this {commentToDelete ? "comment" : "post"}?
+            </p>
             <div className="flex justify-end space-x-4">
               <button
                 onClick={handleCancelDelete}
@@ -106,7 +156,7 @@ export default function Home() {
                 Cancel
               </button>
               <button
-                onClick={handleConfirmDelete}
+                onClick={commentToDelete ? handleConfirmDeleteComment : handleConfirmDeletePost}
                 className="bg-red-500 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-red-600"
               >
                 Delete
@@ -119,7 +169,18 @@ export default function Home() {
   );
 }
 
-const Post = ({ userImage, userName, userId, postImage, postId, initialLikes, initialComments, caption, confirmDeleteComment }) => {
+const Post = ({
+  userImage,
+  userName,
+  userId,
+  postImage,
+  postId,
+  initialLikes,
+  initialComments,
+  caption,
+  confirmDeleteComment,
+  confirmDeletePost,
+}) => {
   const [isLiked, setIsLiked] = useState(initialLikes.includes(JSON.parse(localStorage.getItem("user"))._id));
   const [likes, setLikes] = useState(initialLikes.length);
   const [comments, setComments] = useState(initialComments);
@@ -198,6 +259,59 @@ const Post = ({ userImage, userName, userId, postImage, postId, initialLikes, in
     }
   };
 
+  const handleDeleteComment = (commentId) => {
+    // Optimistically update the UI
+    setComments((prevComments) => prevComments.filter((comment) => comment._id !== commentId));
+
+    fetch(`http://localhost:5000/deletecomment/${postId}/${commentId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("jwt"),
+      },
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        if (!result.comments) {
+          console.error("Failed to delete comment");
+        }
+      })
+      .catch((err) => {
+        console.error("Error deleting comment:", err);
+      });
+  };
+
+  const handleDeletePost = () => {
+    fetch(`http://localhost:5000/deletePost/${postId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("jwt"),
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then((error) => {
+            throw new Error(error.error || "Failed to delete post");
+          });
+        }
+        return res.json();
+      })
+      .then((result) => {
+        if (result.message) {
+          toast.success("Post deleted successfully!");
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000); // Reload after 2 seconds to allow the toast to be visible
+        } else {
+          console.error("Failed to delete post:", result);
+          toast.error("Failed to delete post. Please try again.");
+        }
+      })
+      .catch((err) => {
+        console.error("Error deleting post:", err);
+        toast.error("Oops! Something went wrong while deleting the post.");
+      });
+  };
+
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-md mx-auto mb-6">
       <div className="flex items-center px-4 py-3 border-b border-gray-200">
@@ -206,7 +320,7 @@ const Post = ({ userImage, userName, userId, postImage, postId, initialLikes, in
           alt={userName || "User"}
           className="w-10 h-10 rounded-full object-cover"
         />
-        <div className="ml-3">
+        <div className="ml-3 flex-1">
           <Link to={`/profile/${userId}`}>
             <h3 className="text-sm font-medium text-gray-900 cursor-pointer">{userName || "User"}</h3>
           </Link>
@@ -286,7 +400,20 @@ const Post = ({ userImage, userName, userId, postImage, postId, initialLikes, in
               {/* Comments Section */}
               <div className="w-full sm:w-1/2 pl-0 sm:pl-4 flex flex-col justify-between max-h-[60vh]">
                 <div className="space-y-4 overflow-y-auto" style={{ maxHeight: '300px' }}>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-4">Comments</h3>
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-xl font-semibold text-gray-800 mb-4">Comments</h3>
+                    {userId === JSON.parse(localStorage.getItem("user"))._id && (
+    <button
+        onClick={handleDeletePost}
+        className="flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-500 to-pink-500 hover:shadow-lg hover:from-red-600 hover:to-pink-600 rounded-full transition-all duration-300 transform "
+    >
+        <FaTrash className="mr-2 text-lg" /> Delete Post
+    </button>
+)}
+
+
+
+                  </div>
 
                   {/* Comment List */}
                   <div className="space-y-4">
@@ -302,13 +429,16 @@ const Post = ({ userImage, userName, userId, postImage, postId, initialLikes, in
                           <p className="text-sm text-gray-600">{comment.text}</p>
                         </div>
                         {comment.postedBy._id === JSON.parse(localStorage.getItem("user"))._id && (
-                          <button
-                            onClick={() => confirmDeleteComment(postId, comment._id)}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            <FaTrash />
-                          </button>
-                        )}
+    <button
+        onClick={() => handleDeleteComment(comment._id)}
+        className="flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-white bg-gradient-to-r from-red-500 via-orange-500 to-red-500 hover:bg-gradient-to-l hover:from-red-600 hover:via-orange-600 hover:to-red-600 hover:shadow-lg rounded-full transition-all duration-300 transform  active:scale-95"
+    >
+        <FaTrash className="text-sm" />
+        <span>Delete</span>
+    </button>
+)}
+
+
                       </div>
                     ))}
                   </div>

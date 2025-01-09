@@ -38,6 +38,16 @@ export default function Profile() {
     setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId));
   };
 
+  const handleDeleteComment = (postId, commentId) => {
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post._id === postId
+          ? { ...post, comments: post.comments.filter((comment) => comment._id !== commentId) }
+          : post
+      )
+    );
+  };
+
   return (
     <div className="bg-gray-100 min-h-screen p-4 flex flex-col items-center">
       {/* Profile Header */}
@@ -102,7 +112,7 @@ export default function Profile() {
 
       {/* Post Detail Modal */}
       {show && selectedPost && (
-        <PostDetail post={selectedPost} onClose={() => setShow(false)} onDelete={handleDeletePost} />
+        <PostDetail post={selectedPost} onClose={() => setShow(false)} onDelete={handleDeletePost} onDeleteComment={handleDeleteComment} />
       )}
       {changePic && <ProfilePic onClose={() => setChangePic(false)} />}
     </div>

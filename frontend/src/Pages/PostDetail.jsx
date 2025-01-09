@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-export default function PostDetail({ post, onClose, onDelete }) {
+export default function PostDetail({ post, onClose, onDelete, onDeleteComment }) {
   const [comments, setComments] = useState(post.comments);
   const [commentText, setCommentText] = useState("");
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ export default function PostDetail({ post, onClose, onDelete }) {
     if (commentText.trim()) {
       const newComment = {
         text: commentText,
-        postedBy: { _id: "user_id", name: "User Name", pic: "user_pic_url" }, // Replace with actual user data
+        postedBy: JSON.parse(localStorage.getItem("user")), // Replace with actual user data
       };
 
       // Optimistic UI update: add the new comment locally
@@ -49,6 +49,29 @@ export default function PostDetail({ post, onClose, onDelete }) {
           setComments(comments); // Revert to previous state if failed
         });
     }
+  };
+
+  const handleDeleteComment = (commentId) => {
+    // Optimistically update the UI
+    setComments((prevComments) => prevComments.filter((comment) => comment._id !== commentId));
+
+    fetch(`http://localhost:5000/deletecomment/${post._id}/${commentId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("jwt"),
+      },
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        if (!result.comments) {
+          console.error("Failed to delete comment");
+        } else {
+          onDeleteComment(post._id, commentId);
+        }
+      })
+      .catch((err) => {
+        console.error("Error deleting comment:", err);
+      });
   };
 
   const handleDeletePost = () => {
@@ -87,7 +110,7 @@ export default function PostDetail({ post, onClose, onDelete }) {
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-50 z-10 flex justify-center items-center">
       <ToastContainer />
-      <div className="bg-white rounded-lg overflow-hidden w-10/12 max-w-3xl p-6 relative">
+      <div className="bg-white rounded-lg overflow-hidden w-full max-w-3xl p-6 relative mx-4 sm:mx-0">
         {/* Close Button at the Top Right */}
         <button
           onClick={onClose}
@@ -96,9 +119,9 @@ export default function PostDetail({ post, onClose, onDelete }) {
           &times;
         </button>
 
-        <div className="flex mt-6">
+        <div className="flex flex-col sm:flex-row mt-6">
           {/* Image Section, with margin-top to move it down */}
-          <div className="w-1/2 pr-4 flex items-center justify-center">
+          <div className="w-full sm:w-1/2 pr-0 sm:pr-4 flex items-center justify-center mb-4 sm:mb-0">
             <div className="relative w-full h-0 pb-[100%]">
               <img
                 src={post.photo || "https://via.placeholder.com/300"}
@@ -109,12 +132,15 @@ export default function PostDetail({ post, onClose, onDelete }) {
           </div>
 
           {/* Comments Section */}
-          <div className="w-1/2 pl-4 flex flex-col justify-between max-h-[60vh]">
+          <div className="w-full sm:w-1/2 pl-0 sm:pl-4 flex flex-col justify-between max-h-[60vh]">
             <div className="space-y-4 overflow-y-auto" style={{ maxHeight: '300px' }}>
               <div className="flex justify-between items-center">
                 <h3 className="text-xl font-semibold text-gray-800 mb-4">Comments</h3>
-                <button onClick={handleDeletePost} className="text-red-500 hover:text-red-700">
-                  <FaTrash />
+                <button
+                  onClick={handleDeletePost}
+                  className="flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-500 to-pink-500 hover:shadow-lg hover:from-red-600 hover:to-pink-600 rounded-full transition-all duration-300 transform"
+                >
+                  <FaTrash className="mr-2 text-lg" /> Delete Post
                 </button>
               </div>
 
@@ -131,6 +157,15 @@ export default function PostDetail({ post, onClose, onDelete }) {
                       <p className="font-medium text-gray-800">{comment.postedBy.name}</p>
                       <p className="text-sm text-gray-600">{comment.text}</p>
                     </div>
+                    {comment.postedBy._id === JSON.parse(localStorage.getItem("user"))._id && (
+                      <button
+                        onClick={() => handleDeleteComment(comment._id)}
+                        className="flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-white bg-gradient-to-r from-red-500 via-orange-500 to-red-500 hover:bg-gradient-to-l hover:from-red-600 hover:via-orange-600 hover:to-red-600 hover:shadow-lg rounded-full transition-all duration-300 transform active:scale-95"
+                      >
+                        <FaTrash className="text-sm" />
+                        <span>Delete</span>
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
