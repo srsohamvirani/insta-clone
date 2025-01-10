@@ -5,6 +5,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function Home() {
+  // var picLink = "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [commentToDelete, setCommentToDelete] = useState(null);

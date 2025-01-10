@@ -5,7 +5,6 @@ const POST = mongoose.model("POST");
 const USER = mongoose.model("USER");
 const requireLogin = require("../middlewares/requireLogin");
 
-
 // Fetch current user's profile, posts, followers, and following details
 router.get('/myprofile', requireLogin, async (req, res) => {
     try {
@@ -29,8 +28,6 @@ router.get('/myprofile', requireLogin, async (req, res) => {
         return res.status(500).json({ error: "An error occurred" });
     }
 });
-
-
 
 // to get user profile
 router.get("/user/:id", async (req, res) => {
@@ -56,8 +53,6 @@ router.get("/user/:id", async (req, res) => {
         return res.status(500).json({ error: "An error occurred" });
     }
 });
-
-
 
 // Fetch user details along with followers and following details
 router.get('/user/:id', requireLogin, (req, res) => {
@@ -124,6 +119,34 @@ router.put("/unfollow", requireLogin, (req, res) => {
     })
     .catch(err => res.status(422).json({ error: err }));
 });
+
+// to upload profile picture
+router.put("/uploadProfilePic", requireLogin, async (req, res) => {
+    try {
+        console.log("Updating profile picture for:", req.user._id);
+        console.log("New picture URL:", req.body.pic);
+
+        const user = await USER.findByIdAndUpdate(
+            req.user._id,
+            { $set: { Photo: req.body.pic } },
+            { new: true, runValidators: true }
+        )
+        .populate("followers", "_id name pic")
+        .populate("following", "_id name pic");
+
+        if (!user) {
+            console.log("No user found for the given ID:", req.user._id);
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        console.log("User updated successfully:", user);
+        res.json(user);
+    } catch (err) {
+        console.error("Error in /uploadProfilePic:", err);
+        res.status(422).json({ error: err.message });
+    }
+});
+
 
 
 module.exports = router;

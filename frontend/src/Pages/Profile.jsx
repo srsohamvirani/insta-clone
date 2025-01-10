@@ -3,6 +3,7 @@ import PostDetail from "./PostDetail"; // Import the PostDetail component
 import ProfilePic from "./ProfilePic";
 
 export default function Profile() {
+  var picLink = "https://cdn-icons-png.flaticon.com/512/3177/3177440.png"
   const [user, setUser] = useState({});
   const [posts, setPosts] = useState([]);
   const [show, setShow] = useState(false);
@@ -55,7 +56,7 @@ export default function Profile() {
         <div className="flex items-center space-x-6 mb-4 md:mb-0">
           <img
             onClick={changeProfile}
-            src={user.pic || "https://via.placeholder.com/150"}
+            src={user.Photo ? user.Photo : picLink}
             alt="Profile"
             className="h-24 w-24 rounded-full object-cover border-4 border-blue-500"
           />

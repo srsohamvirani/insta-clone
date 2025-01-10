@@ -3,6 +3,7 @@ import PostDetail from "./PostDetail"; // Import the PostDetail component
 import { useParams } from "react-router-dom";
 
 export default function UserProfile() {
+  var picLink = "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
   const { userid } = useParams();
   const [user, setUser] = useState({});
   const [posts, setPosts] = useState([]);
@@ -90,7 +91,7 @@ export default function UserProfile() {
       <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl mb-6 flex flex-col md:flex-row justify-between items-center">
         <div className="flex items-center space-x-6 mb-4 md:mb-0">
           <img
-            src={user.pic || "https://via.placeholder.com/150"}
+            src={user.Photo ? user.Photo : picLink}
             alt="Profile"
             className="h-24 w-24 rounded-full object-cover border-4 border-blue-500"
           />
