@@ -12,8 +12,15 @@ export default function Signin() {
   const [password, setPassword] = useState("");
 
   // Toast functions
-  const notifyA = (msg) => toast.error(msg);
-  const notifyB = (msg) => toast.success(msg);
+  const notifyA = (msg) => {
+    console.log("Error Toast Triggered:", msg); // Debugging log
+    toast.error(msg);
+  };
+
+  const notifyB = (msg) => {
+    console.log("Success Toast Triggered:", msg); // Debugging log
+    toast.success(msg);
+  };
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -26,40 +33,42 @@ export default function Signin() {
       return;
     }
 
-    fetch("http://localhost:5000/signin", {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        password: password,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          notifyA(data.error);
-        } else {
-          notifyB("Signed in successfully");
-          localStorage.setItem("jwt", data.token);
-          localStorage.setItem("user", JSON.stringify(data.user));
-
-          setUserLogin(true);
-          navigate("/");
-        }
-      })
-      .catch((err) => {
-        notifyA("Server error, please try again later");
-        console.error("Error:", err);
+    try {
+      const res = await fetch("http://localhost:5000/signin", {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
       });
+
+      const data = await res.json();
+
+      if (data.error) {
+        notifyA(data.error);
+      } else {
+        notifyB("Signed in successfully");
+        localStorage.setItem("jwt", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        setUserLogin(true);
+        navigate("/");
+      }
+    } catch (err) {
+      notifyA("Server error, please try again later");
+      console.error("Error:", err);
+    }
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-4">
-      <ToastContainer />
+      <ToastContainer theme="dark" position="top-right" />
       <img src={logo} alt="logo" className="h-12 w-auto mb-4" />
-      <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Sign in to Instagram</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        Sign in to Instagram
+      </h1>
       <form
         className="w-full max-w-md bg-white p-8 rounded-lg shadow-md"
         onSubmit={postData}

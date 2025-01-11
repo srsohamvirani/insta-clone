@@ -12,8 +12,8 @@ export default function Signup() {
   const [password, setPassword] = useState("");
 
   // Toast functions
-  const notifyA = (msg) => toast.error(msg);
-  const notifyB = (msg) => toast.success(msg);
+  const notifyA = (msg) => toast.error(msg); // For error messages
+  const notifyB = (msg) => toast.success(msg); // For success messages
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -21,14 +21,20 @@ export default function Signup() {
     e.preventDefault();
 
     // Check for empty fields
-    if (!name || !email || !userName || !password) {
+    if (!name.trim() || !email.trim() || !userName.trim() || !password.trim()) {
       notifyA("Please fill all the fields");
       return;
     }
 
-    // Check email format
+    // Validate email format
     if (!emailRegex.test(email)) {
       notifyA("Invalid email format");
+      return;
+    }
+
+    // Check password length
+    if (password.length < 6) {
+      notifyA("Password must be at least 6 characters long");
       return;
     }
 
@@ -39,19 +45,21 @@ export default function Signup() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name,
-          email,
-          userName,
-          password,
+          name: name.trim(),
+          email: email.trim(),
+          userName: userName.trim(),
+          password: password.trim(),
         }),
       });
 
       const data = await response.json();
+
       if (data.error) {
-        notifyA(data.error);
+        notifyA(data.error); // Display server error
       } else {
-        notifyB(data.message);
-        navigate("/signin");
+        navigate("/signin"); 
+        notifyB(data.message); // Display success message
+        // Redirect to Signin page
       }
     } catch (err) {
       console.error("Error:", err);
@@ -61,9 +69,11 @@ export default function Signup() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-4">
-      <ToastContainer />
+      <ToastContainer theme="dark" position="top-right" />
       <img src={logo} alt="logo" className="h-12 w-auto mb-4" />
-      <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Create your account</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        Create your account
+      </h1>
       <form
         className="w-full max-w-md bg-white p-8 rounded-lg shadow-md"
         onSubmit={postData}
