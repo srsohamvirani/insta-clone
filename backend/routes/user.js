@@ -147,6 +147,32 @@ router.put("/uploadProfilePic", requireLogin, async (req, res) => {
     }
 });
 
+// to remove profile picture
+router.put("/removeProfilePic", requireLogin, async (req, res) => {
+    try {
+        console.log("Removing profile picture for:", req.user._id);
+
+        const user = await USER.findByIdAndUpdate(
+            req.user._id,
+            { $unset: { Photo: "" } }, // Use $unset to remove the Photo field
+            { new: true, runValidators: true }
+        )
+        .populate("followers", "_id name pic")
+        .populate("following", "_id name pic");
+
+        if (!user) {
+            console.log("No user found for the given ID:", req.user._id);
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        console.log("Profile picture removed successfully:", user);
+        res.json(user);
+    } catch (err) {
+        console.error("Error in /removeProfilePic:", err);
+        res.status(422).json({ error: err.message });
+    }
+});
+
 
 
 module.exports = router;

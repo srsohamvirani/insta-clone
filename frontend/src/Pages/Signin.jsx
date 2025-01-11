@@ -1,12 +1,12 @@
-import React, { useState,useContext } from "react"; // Add useState import
+import React, { useState, useContext } from "react";
 import logo from "../img/logo.png";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import { LoginContext } from "../context/LoginContext"; // Add LoginContext import  
-
+import { toast, ToastContainer } from "react-toastify";
+import { LoginContext } from "../context/LoginContext";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Signin() {
-  const {setUserLogin}=useContext(LoginContext)
+  const { setUserLogin } = useContext(LoginContext);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,7 +30,6 @@ export default function Signin() {
       method: "post",
       headers: {
         "Content-Type": "application/json",
-      
       },
       body: JSON.stringify({
         email: email,
@@ -43,25 +42,27 @@ export default function Signin() {
           notifyA(data.error);
         } else {
           notifyB("Signed in successfully");
-          console.log(data)   
-          localStorage.setItem("jwt",data.token);
-          localStorage.setItem("user",JSON.stringify(data.user));
+          localStorage.setItem("jwt", data.token);
+          localStorage.setItem("user", JSON.stringify(data.user));
 
           setUserLogin(true);
           navigate("/");
         }
-        console.log(data);
+      })
+      .catch((err) => {
+        notifyA("Server error, please try again later");
+        console.error("Error:", err);
       });
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-4">
+      <ToastContainer />
       <img src={logo} alt="logo" className="h-12 w-auto mb-4" />
-
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Sign in to Instagram</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">Sign in to Instagram</h1>
       <form
-        className="w-full max-w-sm bg-white p-6 rounded-lg shadow-md"
-        onSubmit={postData} // Use onSubmit for form submission
+        className="w-full max-w-md bg-white p-8 rounded-lg shadow-md"
+        onSubmit={postData}
       >
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700" htmlFor="email">

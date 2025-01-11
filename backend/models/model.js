@@ -25,6 +25,6 @@ const userSchema = new mongoose.Schema({
     },
     followers: [{ type:ObjectId, ref: "USER" }],
     following: [{ type: ObjectId, ref: "USER" }],
-});
+},{timestamps: true});
 
 mongoose.model("USER", userSchema);

@@ -5,11 +5,12 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function Home() {
-  // var picLink = "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
+  var picLink = "https://cdn-icons-png.flaticon.com/512/3177/3177440.png";
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [commentToDelete, setCommentToDelete] = useState(null);
   const [postToDelete, setPostToDelete] = useState(null);
+  console.log(data);
 
   useEffect(() => {
     const token = localStorage.getItem("jwt");
@@ -38,7 +39,12 @@ export default function Home() {
     setData((prevData) =>
       prevData.map((post) =>
         post._id === postId
-          ? { ...post, comments: post.comments.filter((comment) => comment._id !== commentId) }
+          ? {
+              ...post,
+              comments: post.comments.filter(
+                (comment) => comment._id !== commentId
+              ),
+            }
           : post
       )
     );
@@ -125,7 +131,7 @@ export default function Home() {
         data.map((post, index) => (
           <Post
             key={index}
-            userImage={post.postedBy.pic}
+            userImage={post.postedBy.Photo}
             userName={post.postedBy.name}
             userId={post.postedBy._id}
             postImage={post.photo}
@@ -145,9 +151,12 @@ export default function Home() {
       {(commentToDelete || postToDelete) && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 z-10 flex justify-center items-center">
           <div className="bg-white rounded-lg overflow-hidden w-full max-w-md p-6 relative mx-4 sm:mx-0">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">Confirm Delete</h3>
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">
+              Confirm Delete
+            </h3>
             <p className="text-gray-600 mb-6">
-              Are you sure you want to delete this {commentToDelete ? "comment" : "post"}?
+              Are you sure you want to delete this{" "}
+              {commentToDelete ? "comment" : "post"}?
             </p>
             <div className="flex justify-end space-x-4">
               <button
@@ -157,7 +166,11 @@ export default function Home() {
                 Cancel
               </button>
               <button
-                onClick={commentToDelete ? handleConfirmDeleteComment : handleConfirmDeletePost}
+                onClick={
+                  commentToDelete
+                    ? handleConfirmDeleteComment
+                    : handleConfirmDeletePost
+                }
                 className="bg-red-500 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-red-600"
               >
                 Delete
@@ -182,9 +195,12 @@ const Post = ({
   confirmDeleteComment,
   confirmDeletePost,
 }) => {
-  const [isLiked, setIsLiked] = useState(initialLikes.includes(JSON.parse(localStorage.getItem("user"))._id));
+  const [isLiked, setIsLiked] = useState(
+    initialLikes.includes(JSON.parse(localStorage.getItem("user"))._id)
+  );
   const [likes, setLikes] = useState(initialLikes.length);
   const [comments, setComments] = useState(initialComments);
+  console.log("🚀 ~ comments:", comments)
 
   const [commentText, setCommentText] = useState("");
   const [showCommentsModal, setShowCommentsModal] = useState(false);
@@ -196,19 +212,26 @@ const Post = ({
     setIsLiked(newIsLiked);
     setLikes(newLikes);
 
-    fetch(newIsLiked ? "http://localhost:5000/like" : "http://localhost:5000/unlike", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("jwt"),
-      },
-      body: JSON.stringify({ postId }),
-    })
+    fetch(
+      newIsLiked
+        ? "http://localhost:5000/like"
+        : "http://localhost:5000/unlike",
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("jwt"),
+        },
+        body: JSON.stringify({ postId }),
+      }
+    )
       .then((res) => res.json())
       .then((result) => {
         if (result.likes) {
           setLikes(result.likes.length);
-          setIsLiked(result.likes.includes(JSON.parse(localStorage.getItem("user"))._id));
+          setIsLiked(
+            result.likes.includes(JSON.parse(localStorage.getItem("user"))._id)
+          );
         }
       })
       .catch((err) => {
@@ -262,7 +285,9 @@ const Post = ({
 
   const handleDeleteComment = (commentId) => {
     // Optimistically update the UI
-    setComments((prevComments) => prevComments.filter((comment) => comment._id !== commentId));
+    setComments((prevComments) =>
+      prevComments.filter((comment) => comment._id !== commentId)
+    );
 
     fetch(`http://localhost:5000/deletecomment/${postId}/${commentId}`, {
       method: "DELETE",
@@ -317,13 +342,18 @@ const Post = ({
     <div className="bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-md mx-auto mb-6">
       <div className="flex items-center px-4 py-3 border-b border-gray-200">
         <img
-          src={userImage || "https://via.placeholder.com/150"}
+          src={
+            userImage ||
+            "https://cdn-icons-png.flaticon.com/512/3177/3177440.png"
+          }
           alt={userName || "User"}
           className="w-10 h-10 rounded-full object-cover"
         />
         <div className="ml-3 flex-1">
           <Link to={`/profile/${userId}`}>
-            <h3 className="text-sm font-medium text-gray-900 cursor-pointer">{userName || "User"}</h3>
+            <h3 className="text-sm font-medium text-gray-900 cursor-pointer">
+              {userName || "User"}
+            </h3>
           </Link>
         </div>
       </div>
@@ -340,8 +370,15 @@ const Post = ({
 
       <div className="px-4 py-3 space-y-3">
         <div className="flex items-center space-x-4">
-          <button onClick={handleLike} className="flex items-center text-sm font-medium text-gray-600">
-            {isLiked ? <FaHeart className="text-red-500 text-lg" /> : <FaRegHeart className="text-lg" />}
+          <button
+            onClick={handleLike}
+            className="flex items-center text-sm font-medium text-gray-600"
+          >
+            {isLiked ? (
+              <FaHeart className="text-red-500 text-lg" />
+            ) : (
+              <FaRegHeart className="text-lg" />
+            )}
             <span className="ml-1">{likes} Likes</span>
           </button>
           <div className="flex items-center text-sm font-medium text-gray-600">
@@ -354,7 +391,9 @@ const Post = ({
             </span>
           </div>
         </div>
-        <p className="text-sm text-gray-700">{caption || "No caption available"}</p>
+        <p className="text-sm text-gray-700">
+          {caption || "No caption available"}
+        </p>
       </div>
 
       <div className="px-4 py-3 border-t border-gray-200">
@@ -400,46 +439,58 @@ const Post = ({
 
               {/* Comments Section */}
               <div className="w-full sm:w-1/2 pl-0 sm:pl-4 flex flex-col justify-between max-h-[60vh]">
-                <div className="space-y-4 overflow-y-auto" style={{ maxHeight: '300px' }}>
+                <div
+                  className="space-y-4 overflow-y-auto"
+                  style={{ maxHeight: "300px" }}
+                >
                   <div className="flex justify-between items-center">
-                    <h3 className="text-xl font-semibold text-gray-800 mb-4">Comments</h3>
-                    {userId === JSON.parse(localStorage.getItem("user"))._id && (
-    <button
-        onClick={handleDeletePost}
-        className="flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-500 to-pink-500 hover:shadow-lg hover:from-red-600 hover:to-pink-600 rounded-full transition-all duration-300 transform "
-    >
-        <FaTrash className="mr-2 text-lg" /> Delete Post
-    </button>
-)}
-
-
-
+                    <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                      Comments
+                    </h3>
+                    {userId ===
+                      JSON.parse(localStorage.getItem("user"))._id && (
+                      <button
+                        onClick={handleDeletePost}
+                        className="flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-500 to-pink-500 hover:shadow-lg hover:from-red-600 hover:to-pink-600 rounded-full transition-all duration-300 transform "
+                      >
+                        <FaTrash className="mr-2 text-lg" /> Delete Post
+                      </button>
+                    )}
                   </div>
 
                   {/* Comment List */}
                   <div className="space-y-4">
                     {comments.map((comment) => (
-                      <div key={comment._id} className="flex items-center space-x-3">
+                      <div
+                        key={comment._id}
+                        className="flex items-center space-x-3"
+                      >
                         <img
-                          src={comment.postedBy.pic || "https://via.placeholder.com/150"}
+                          src={
+                            comment.postedBy.pic ||
+                            "https://via.placeholder.com/150"
+                          }
                           alt={comment.postedBy.name || "User"}
                           className="w-10 h-10 rounded-full object-cover"
                         />
                         <div className="flex-1">
-                          <p className="font-medium text-gray-800">{comment.postedBy.name}</p>
-                          <p className="text-sm text-gray-600">{comment.text}</p>
+                          <p className="font-medium text-gray-800">
+                            {comment.postedBy.name}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {comment.text}
+                          </p>
                         </div>
-                        {comment.postedBy._id === JSON.parse(localStorage.getItem("user"))._id && (
-    <button
-        onClick={() => handleDeleteComment(comment._id)}
-        className="flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-white bg-gradient-to-r from-red-500 via-orange-500 to-red-500 hover:bg-gradient-to-l hover:from-red-600 hover:via-orange-600 hover:to-red-600 hover:shadow-lg rounded-full transition-all duration-300 transform  active:scale-95"
-    >
-        <FaTrash className="text-sm" />
-        <span>Delete</span>
-    </button>
-)}
-
-
+                        {comment.postedBy._id ===
+                          JSON.parse(localStorage.getItem("user"))._id && (
+                          <button
+                            onClick={() => handleDeleteComment(comment._id)}
+                            className="flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-white bg-gradient-to-r from-red-500 via-orange-500 to-red-500 hover:bg-gradient-to-l hover:from-red-600 hover:via-orange-600 hover:to-red-600 hover:shadow-lg rounded-full transition-all duration-300 transform  active:scale-95"
+                          >
+                            <FaTrash className="text-sm" />
+                            <span>Delete</span>
+                          </button>
+                        )}
                       </div>
                     ))}
                   </div>
