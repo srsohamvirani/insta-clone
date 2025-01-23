@@ -467,7 +467,7 @@ const Post = ({
                       >
                         <img
                           src={
-                            comment.postedBy.pic ||
+                            comment.postedBy.Photo ||
                             "https://via.placeholder.com/150"
                           }
                           alt={comment.postedBy.name || "User"}

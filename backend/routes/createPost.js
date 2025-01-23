@@ -25,7 +25,7 @@ router.post("/createPost", requireLogin, (req, res) => {
 router.get("/allPosts", requireLogin, (req, res) => {
   POST.find()
     .populate("postedBy", "_id name Photo")
-    .populate("comments.postedBy", "_id name")
+    .populate("comments.postedBy", "_id name Photo")
     .sort("-createdAt")
     .then((posts) => {
       res.json({ posts });
@@ -37,8 +37,8 @@ router.get("/allPosts", requireLogin, (req, res) => {
 
 router.get("/myposts", requireLogin, (req, res) => {
   POST.find({ postedBy: req.user._id })
-    .populate("postedBy", "_id name")
-    .populate("comments.postedBy", "_id name")
+    .populate("postedBy", "_id name Photo")
+    .populate("comments.postedBy", "_id name Photo")
     .sort("-createdAt")
     .then((myposts) => {
       res.json({ myposts });
@@ -110,7 +110,7 @@ router.put("/comment", requireLogin, async (req, res) => {
         $push: { comments: comment }, // Add the new comment to the post's comment array
       },
       { new: true }
-    ).populate("comments.postedBy", "_id name pic"); // Populate the postedBy field with user info
+    ).populate("comments.postedBy", "_id name Photo"); // Populate the postedBy field with user info
     
 
     if (!updatedPost) {
@@ -132,7 +132,7 @@ router.delete("/deletecomment/:postId/:commentId", requireLogin, async (req, res
         $pull: { comments: { _id: req.params.commentId, postedBy: req.user._id } },
       },
       { new: true }
-    ).populate("comments.postedBy", "_id name pic");
+    ).populate("comments.postedBy", "_id name Photo");
 
     if (!updatedPost) {
       return res.status(404).json({ error: "Post not found" });
@@ -172,8 +172,8 @@ router.delete("/deletePost/:postId", requireLogin, async (req, res) => {
 // to showing following post
 router.get("/myfollowingpost", requireLogin, async (req, res) => {
     POST.find({ postedBy: { $in: req.user.following } })
-        .populate("postedBy", "_id name")
-        .populate("comments.postedBy", "_id name pic")
+        .populate("postedBy", "_id name Photo")
+        .populate("comments.postedBy", "_id name Photo")
         .sort("-createdAt")
         .then((posts) => {
             res.json({ posts });

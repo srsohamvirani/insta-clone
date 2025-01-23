@@ -67,7 +67,7 @@ export default function MyFollowingPost() {
         data.map((post, index) => (
           <Post
             key={index}
-            userImage={post.postedBy.pic}
+            userImage={post.postedBy.Photo}
             userName={post.postedBy.name}
             userId={post.postedBy._id}
             postImage={post.photo}
@@ -265,7 +265,7 @@ const Post = ({
                     {comments.map((comment) => (
                       <div key={comment._id} className="flex items-center space-x-3">
                         <img
-                          src={comment.postedBy.pic || "https://via.placeholder.com/150"}
+                          src={comment.postedBy.Photo || "https://via.placeholder.com/150"}
                           alt={comment.postedBy.name || "User"}
                           className="w-10 h-10 rounded-full object-cover"
                         />
