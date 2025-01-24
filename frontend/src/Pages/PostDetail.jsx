@@ -149,7 +149,7 @@ export default function PostDetail({ post, onClose, onDelete, onDeleteComment })
                 {comments.map((comment) => (
                   <div key={comment._id} className="flex items-center space-x-3">
                     <img
-                      src={comment.postedBy.pic || "https://via.placeholder.com/150"}
+                      src={comment.postedBy.pic || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png"}
                       alt={comment.postedBy.name || "User"}
                       className="w-10 h-10 rounded-full object-cover"
                     />

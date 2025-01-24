@@ -468,7 +468,7 @@ const Post = ({
                         <img
                           src={
                             comment.postedBy.Photo ||
-                            "https://via.placeholder.com/150"
+                            "https://cdn-icons-png.flaticon.com/512/3177/3177440.png"
                           }
                           alt={comment.postedBy.name || "User"}
                           className="w-10 h-10 rounded-full object-cover"

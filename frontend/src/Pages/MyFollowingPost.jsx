@@ -170,7 +170,7 @@ const Post = ({
     <div className="bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-md mx-auto mb-6">
       <div className="flex items-center px-4 py-3 border-b border-gray-200">
         <img
-          src={userImage || "https://via.placeholder.com/150"}
+          src={userImage || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png"}
           alt={userName || "User"}
           className="w-10 h-10 rounded-full object-cover"
         />
@@ -265,7 +265,7 @@ const Post = ({
                     {comments.map((comment) => (
                       <div key={comment._id} className="flex items-center space-x-3">
                         <img
-                          src={comment.postedBy.Photo || "https://via.placeholder.com/150"}
+                          src={comment.postedBy.Photo || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png"}
                           alt={comment.postedBy.name || "User"}
                           className="w-10 h-10 rounded-full object-cover"
                         />

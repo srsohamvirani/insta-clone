@@ -58,7 +58,7 @@ export default function Profile() {
             onClick={changeProfile}
             src={user.Photo ? user.Photo : picLink}
             alt="Profile"
-            className="h-24 w-24 rounded-full object-cover border-4 border-blue-500"
+            className="h-24 w-24 rounded-full object-cover border-4 "
           />
           <div>
             <h1 className="text-3xl font-bold text-gray-800">{user.name || "User"}</h1>

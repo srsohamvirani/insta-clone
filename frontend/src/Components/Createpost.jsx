@@ -150,7 +150,7 @@ export default function Home() {
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col items-center p-4">
       <CreatePost
-        userImage={user.pic || "https://via.placeholder.com/150"} // Replace with the user's profile picture URL
+        userImage={user.pic || "https://cdn-icons-png.flaticon.com/512/3177/3177440.png"} // Replace with the user's profile picture URL
         userName={user.name || "User"} // Replace with the user's name
       />
     </div>
